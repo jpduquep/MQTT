@@ -32,7 +32,7 @@ int main() {
     printf("Conectado al servidor MQTT.\n");
 
     // Enviar mensaje CONNECT (representación simple)
-    char mensajeConnect[] = "Mensaje CONNECT";
+    char mensajeConnect[] = "0001xxxx";
     if (send(sockfd, mensajeConnect, strlen(mensajeConnect), 0) < 0) {
         perror("Fallo al enviar mensaje CONNECT");
         close(sockfd);
@@ -52,7 +52,7 @@ int main() {
 
     // Asegurarse de que la respuesta es una cadena de caracteres válida
     bufferRespuesta[lenRespuesta] = '\0';
-    if(strcmp(bufferRespuesta, "Mensaje CONNACK") == 0) {
+    if(strcmp(bufferRespuesta, "0010xxxx") == 0) {
         printf("CONNACK recibido, puede comenzar a enviar mensajes.\n");
     } else {
         printf("Respuesta no reconocida: %s\n", bufferRespuesta);
