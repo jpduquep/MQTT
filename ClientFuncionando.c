@@ -74,13 +74,13 @@ int main() {
         strncpy(MessageType, bufferRespuesta, 4);
         MessageType[4] = '\0';
 
-        DUPFlag[0] = buffer[4];
+        DUPFlag[0] = bufferRespuesta[4];
         DUPFlag[1] = '\0';
 
         strncpy(QoSFlag, bufferRespuesta + 5, 2);
         QoSFlag[2] = '\0';
 
-        RETAIN[0] = buffer[7];
+        RETAIN[0] = bufferRespuesta[7];
         RETAIN[1] = '\0';
 
         // Convertir MessageType de binario a decimal
