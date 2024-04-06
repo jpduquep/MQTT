@@ -64,6 +64,8 @@ int main() {
     if(strncmp(bufferRespuesta, "0010", 4) == 0) {
         printf("CONNACK recibido, puede comenzar a enviar mensajes.\n");
     } else {
+        printf("Longitud de la respuesta: %zd\n", lenRespuesta);
+        printf("Respuesta recibida: %s\n", bufferRespuesta);
         printf("Respuesta no reconocida: %s\n", bufferRespuesta);
         close(sockfd);
         exit(EXIT_FAILURE);
