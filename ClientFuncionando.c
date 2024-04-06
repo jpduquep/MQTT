@@ -61,7 +61,7 @@ int main() {
 
     // Asegurarse de que la respuesta es una cadena de caracteres válida
     bufferRespuesta[lenRespuesta] = '\0';
-    if(strcmp(bufferRespuesta, "0010xxxx") == 0) {
+    if(strncmp(bufferRespuesta, "0010", 4) == 0) {
         printf("CONNACK recibido, puede comenzar a enviar mensajes.\n");
     } else {
         printf("Respuesta no reconocida: %s\n", bufferRespuesta);
