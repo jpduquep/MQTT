@@ -11,6 +11,7 @@
 int main() {
     int sockfd;
     struct sockaddr_in direccionServidor;
+    char bufferRespuesta[TAMANO_BUFFER];
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
