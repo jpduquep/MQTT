@@ -71,13 +71,13 @@ int main() {
         char QoSFlag[3];     // Sexto y séptimo caracteres + '\0'
         char RETAIN[2];      // Octavo carácter + '\0'
 
-        strncpy(MessageType, buffer, 4);
+        strncpy(MessageType, bufferRespuesta, 4);
         MessageType[4] = '\0';
 
         DUPFlag[0] = buffer[4];
         DUPFlag[1] = '\0';
 
-        strncpy(QoSFlag, buffer + 5, 2);
+        strncpy(QoSFlag, bufferRespuesta + 5, 2);
         QoSFlag[2] = '\0';
 
         RETAIN[0] = buffer[7];
