@@ -64,6 +64,11 @@ int main() {
     if(strncmp(bufferRespuesta, "0010", 4) == 0) {
         printf("CONNACK recibido, puede comenzar a enviar mensajes.\n");
     } else {
+        printf("Datos recibidos en hexadecimal:\n");
+        for (ssize_t i = 0; i < lenRespuesta; ++i) {
+            printf("%02x ", (unsigned char)bufferRespuesta[i]);
+        }
+        printf("\n");
         printf("Longitud de la respuesta: %zd\n", lenRespuesta);
         printf("Respuesta recibida: %s\n", bufferRespuesta);
         printf("Respuesta no reconocida: %s\n", bufferRespuesta);
