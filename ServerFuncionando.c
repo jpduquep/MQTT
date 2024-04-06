@@ -18,13 +18,6 @@ typedef struct {
 Cliente clientes[MAX_CLIENTES];
 pthread_mutex_t mutexClientes = PTHREAD_MUTEX_INITIALIZER;
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h> // Para close()
-
-#define TAMANO_BUFFER 1024
-
 void *manejarConexionCliente(void *data) {
     int sockfd = *((int*)data);
     free(data);  // Liberar memoria asignada para el descriptor del socket
