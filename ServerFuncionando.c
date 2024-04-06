@@ -18,6 +18,13 @@ typedef struct {
 Cliente clientes[MAX_CLIENTES];
 pthread_mutex_t mutexClientes = PTHREAD_MUTEX_INITIALIZER;
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h> // Para close()
+
+#define TAMANO_BUFFER 1024
+
 void *manejarConexionCliente(void *data) {
     int sockfd = *((int*)data);
     free(data);  // Liberar memoria asignada para el descriptor del socket
@@ -25,49 +32,62 @@ void *manejarConexionCliente(void *data) {
     char buffer[TAMANO_BUFFER];
     ssize_t mensajeLen;
 
-    // Esperar por un mensaje CONNECT
+    // Esperar por un mensaje
     mensajeLen = recv(sockfd, buffer, TAMANO_BUFFER - 1, 0);
     if (mensajeLen > 0) {
         buffer[mensajeLen] = '\0';  // Asegurar que el buffer es una cadena de caracteres válida
 
-        // Verificar si el mensaje es un CONNECT
-        if (strcmp(buffer, "0001xxxx") == 0) {
-            printf("Mensaje CONNECT recibido de un cliente.\n"); // Imprimir cuando se recibe CONNECT
+        // Deserializar el mensaje MQTT
+        char MessageType[5]; // Primeros 4 caracteres + '\0'
+        char DUPFlag[2];     // Quinto carácter + '\0'
+        char QoSFlag[3];     // Sexto y séptimo caracteres + '\0'
+        char RETAIN[2];      // Octavo carácter + '\0'
 
-            // Enviar respuesta CONNACK (representación simple)
-            char mensajeConnack[] = "0010xxxx";
-            if (send(sockfd, mensajeConnack, strlen(mensajeConnack), 0) < 0) {
-                perror("Fallo al enviar mensaje CONNACK");
-            } else {
-                printf("Mensaje CONNACK enviado al cliente.\n"); // Imprimir cuando se envía CONNACK
-            }
+        strncpy(MessageType, buffer, 4);
+        MessageType[4] = '\0';
 
-            // Bucle de escucha para mensajes adicionales después de CONNECT
-            while ((mensajeLen = recv(sockfd, buffer, TAMANO_BUFFER - 1, 0)) > 0) {
-                buffer[mensajeLen] = '\0'; // Asegurar que el buffer es una cadena de caracteres válida
-                printf("Mensaje recibido (bytes): %zd\n", mensajeLen);
-                printf("Contenido del mensaje: %s \n", buffer);
+        DUPFlag[0] = buffer[4];
+        DUPFlag[1] = '\0';
 
-                // Aquí se manejarían otros mensajes MQTT recibidos
-            }
+        strncpy(QoSFlag, buffer + 5, 2);
+        QoSFlag[2] = '\0';
 
-            if (mensajeLen == 0) {
-                printf("Cliente desconectado\n");
-            } else if (mensajeLen < 0) {
-                perror("Error en recv");
-            }
-        } else {
-            printf("Esperado mensaje CONNECT, recibido: %s\n", buffer);
+        RETAIN[0] = buffer[7];
+        RETAIN[1] = '\0';
+
+        // Convertir MessageType de binario a decimal
+        int messageTypeInt = strtol(MessageType, NULL, 2);
+
+        // Usar un switch para interpretar MessageType
+        switch (messageTypeInt) {
+            case 1: // CONNECT
+                printf("CONNECT: Client request to connect to Server\n");
+                // Enviar respuesta CONNACK (representación simple)
+                char mensajeConnack[] = "0010xxxx";
+                if (send(sockfd, mensajeConnack, strlen(mensajeConnack), 0) < 0) {
+                    perror("Fallo al enviar mensaje CONNACK");
+                } else {
+                    printf("Mensaje CONNACK enviado al cliente.\n");
+                }
+                break;
+            case 3: // PUBLISH
+                printf("PUBLISH: Publish message\n");
+                // Aquí se enviaría una respuesta adecuada para PUBLISH, por ejemplo, PUBACK
+                break;
+            // Agregar más casos según sea necesario
+            default:
+                printf("Mensaje no esperado o desconocido. MessageType: %d\n", messageTypeInt);
         }
     } else if (mensajeLen == 0) {
-        printf("Cliente desconectado antes de enviar CONNECT\n");
+        printf("Cliente desconectado antes de cualquier acción\n");
     } else {
-        perror("Error en recv al esperar CONNECT");
+        perror("Error en recv");
     }
 
     close(sockfd);  // Cerrar la conexión
     return NULL;
 }
+
 
 
 int main() {

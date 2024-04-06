@@ -28,27 +28,34 @@ int main() {
         close(sockfd);
         exit(EXIT_FAILURE);
     }
-
-    printf("Conectado al servidor MQTT.\n");
+    else{
+        printf("Conectado al servidor MQTT.\n");
+    }
+    
 
     // Enviar mensaje CONNECT (representación simple)
+    
     char mensajeConnect[] = "0001xxxx";
     if (send(sockfd, mensajeConnect, strlen(mensajeConnect), 0) < 0) {
         perror("Fallo al enviar mensaje CONNECT");
         close(sockfd);
         exit(EXIT_FAILURE);
     }
+    else{
+        
+        printf("Mensaje CONNECT enviado, esperando CONNACK...\n");
 
-    printf("Mensaje CONNECT enviado, esperando CONNACK...\n");
-
-    // Esperar respuesta CONNACK del servidor
-    char bufferRespuesta[TAMANO_BUFFER];
-    ssize_t lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER - 1, 0);
-    if (lenRespuesta < 0) {
-        perror("Error al recibir respuesta");
-        close(sockfd);
-        exit(EXIT_FAILURE);
+        // Esperar respuesta CONNACK del servidor
+        char bufferRespuesta[TAMANO_BUFFER];
+        ssize_t lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER - 1, 0);
+        if (lenRespuesta < 0) {
+            perror("Error al recibir respuesta");
+            close(sockfd);
+            exit(EXIT_FAILURE);
+        }
     }
+
+    
 
     // Asegurarse de que la respuesta es una cadena de caracteres válida
     bufferRespuesta[lenRespuesta] = '\0';
