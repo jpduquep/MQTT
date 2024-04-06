@@ -62,7 +62,7 @@ int main() {
     // Asegurarse de que la respuesta es una cadena de caracteres válida
     lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER - 1, 0);
 
-    if(mensajeLen>0){
+    if(lenRespuesta>0){
     bufferRespuesta[lenRespuesta] = '\0';
 
     // Deserializar el mensaje MQTT
