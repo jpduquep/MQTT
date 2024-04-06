@@ -53,6 +53,7 @@ void *manejarConexionCliente(void *data) {
 
         // Usar un switch para interpretar MessageType
         switch (messageTypeInt) {
+            
             case 1: // CONNECT
                 printf("CONNECT: Client request to connect to Server\n");
                 // Enviar respuesta CONNACK (representación simple)
@@ -63,6 +64,8 @@ void *manejarConexionCliente(void *data) {
                     printf("Mensaje CONNACK enviado al cliente.\n");
                 }
                 break;
+
+
             case 3: // PUBLISH
                 printf("PUBLISH: Publish message\n");
                 // Aquí se enviaría una respuesta adecuada para PUBLISH, por ejemplo, PUBACK

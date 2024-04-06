@@ -60,20 +60,45 @@ int main() {
     
 
     // Asegurarse de que la respuesta es una cadena de caracteres válida
+    lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER - 1, 0);
+
+    if(mensajeLen>0){
     bufferRespuesta[lenRespuesta] = '\0';
-    if(strncmp(bufferRespuesta, "0010", 4) == 0) {
-        printf("CONNACK recibido, puede comenzar a enviar mensajes.\n");
-    } else {
-        printf("Datos recibidos en hexadecimal:\n");
-        for (ssize_t i = 0; i < lenRespuesta; ++i) {
-            printf("%02x ", (unsigned char)bufferRespuesta[i]);
-        }
-        printf("\n");
-        printf("Longitud de la respuesta: %zd\n", lenRespuesta);
-        printf("Respuesta recibida: %s\n", bufferRespuesta);
-        printf("Respuesta no reconocida: %s\n", bufferRespuesta);
-        close(sockfd);
-        exit(EXIT_FAILURE);
+
+    // Deserializar el mensaje MQTT
+        char MessageType[5]; // Primeros 4 caracteres + '\0'
+        char DUPFlag[2];     // Quinto carácter + '\0'
+        char QoSFlag[3];     // Sexto y séptimo caracteres + '\0'
+        char RETAIN[2];      // Octavo carácter + '\0'
+
+        strncpy(MessageType, buffer, 4);
+        MessageType[4] = '\0';
+
+        DUPFlag[0] = buffer[4];
+        DUPFlag[1] = '\0';
+
+        strncpy(QoSFlag, buffer + 5, 2);
+        QoSFlag[2] = '\0';
+
+        RETAIN[0] = buffer[7];
+        RETAIN[1] = '\0';
+
+        // Convertir MessageType de binario a decimal
+        int messageTypeInt = strtol(MessageType, NULL, 2);
+         switch (messageTypeInt) {
+            
+            case 2: // CONNACK
+                printf("CONNACK recibido, puede comenzar a enviar mensajes.\n");
+                
+                break;
+            default:
+                printf("\n");
+                printf("Longitud de la respuesta: %zd\n", lenRespuesta);
+                printf("Respuesta no reconocida: %s\n", bufferRespuesta);
+                close(sockfd);
+                exit(EXIT_FAILURE);
+        
+    }
     }
 
     // Bucle para enviar mensajes ingresados por el usuario
