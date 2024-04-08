@@ -85,6 +85,7 @@ int main() {
 
         // Convertir MessageType de binario a decimal
         int messageTypeInt = strtol(MessageType, NULL, 2);
+        printf("Entero MessageType %d",messageTypeInt);
          switch (messageTypeInt) {
             
             case 2: // CONNACK
