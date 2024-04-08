@@ -46,15 +46,6 @@ int main() {
     else{
         
         printf("Mensaje CONNECT enviado, esperando CONNACK...\n");
-
-        // Esperar respuesta CONNACK del servidor
-        char bufferRespuesta[TAMANO_BUFFER];
-        ssize_t lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER - 1, 0);
-        if (lenRespuesta < 0) {
-            perror("Error al recibir respuesta");
-            close(sockfd);
-            exit(EXIT_FAILURE);
-        }
     }
 
     
