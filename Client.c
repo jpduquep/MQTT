@@ -102,6 +102,8 @@ int main(int argc, char *argv[]) {
 
 
     // Receive response from the server
+
+
     lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0);
     if (lenRespuesta > 0) {
     // Asumiendo que el primer byte de bufferRespuesta contiene el byte de control MQTT
@@ -137,25 +139,39 @@ int main(int argc, char *argv[]) {
     }
 
     // Interactive loop for sending messages to the server
-     while (1) {
-        printf("Ingrese su mensaje (escriba 'salir' para terminar): ");
-        char mensajeUsuario[TAMANO_BUFFER];
-        if (fgets(mensajeUsuario, TAMANO_BUFFER, stdin) != NULL) {
-            // Verificar si el usuario quiere terminar
-            if (strcmp(mensajeUsuario, "salir\n") == 0) {
-                break;
-            }
-
-            // Enviar el mensaje ingresado al servidor
-            if (send(sockfd, mensajeUsuario, strlen(mensajeUsuario), 0) < 0) {
-                perror("Fallo al enviar el mensaje");
-                break;
-            }
-        }
+    // Interactive loop for sending messages to the server
+    while (1) {
+    printf("Ingrese su mensaje (escriba 'salir' para terminar): ");
+    if (fgets(bufferRespuesta, TAMANO_BUFFER, stdin) == NULL) {
+        break; // Manejar EOF
+    }
+    if (strcmp(bufferRespuesta, "salir\n") == 0) {
+        break;
     }
 
-    // Close the socket and end the program
+    // Enviar el mensaje ingresado al servidor
+    if (send(sockfd, bufferRespuesta, strlen(bufferRespuesta), 0) < 0) {
+        perror("Fallo al enviar el mensaje");
+        break;
+    }
+
+    // Esperar una respuesta del servidor después de enviar el mensaje
+    lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER - 1, 0);
+    if (lenRespuesta > 0) {
+        bufferRespuesta[lenRespuesta] = '\0'; // Asegurar que el buffer es una cadena de caracteres válida
+        printf("Respuesta del servidor: %s\n", bufferRespuesta);
+    } else if (lenRespuesta == 0) {
+        printf("El servidor cerró la conexión.\n");
+        break;
+    } else {
+        perror("Error al recibir respuesta");
+        break;
+    }
+}
+
+        // Cerrar el socket antes de terminar el programa
     close(sockfd);
+
     return 0;
 }
 
