@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
         
         printf("Mensaje CONNECT enviado, esperando CONNACK...\n");
         // Esperar respuesta CONNACK del servidor
-        ssize_t lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER - 1, 0);
+        lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER - 1, 0);
         if (lenRespuesta < 0) {
             perror("Error al recibir respuesta");
             close(sockfd);
@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
 
 
     // Receive response from the server
-    ssize_t lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0);
+    lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0);
     if (lenRespuesta > 0) {
     // Asumiendo que el primer byte de bufferRespuesta contiene el byte de control MQTT
     unsigned char byteControl = bufferRespuesta[0];
