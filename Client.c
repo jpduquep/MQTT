@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
     // Manejar error en recv
     printf("No hay nada por leer.");
     }
-    else(){
+    else{
         perror("Errorete rarete jeje");
     }
 
