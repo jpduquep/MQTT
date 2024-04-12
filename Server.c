@@ -25,8 +25,8 @@ void *manejarConexionCliente(void *data) {
 
     // Esperar por un mensaje utf 8 ...
     // Supongamos que `buffer` es un array de unsigned char recibido de recv y ya está definido.
-mensajeLen = recv(sockfd, buffer, BUFFER_SIZE, 0);
-if (mensajeLen > 0) {
+    mensajeLen = recv(sockfd, buffer, BUFFER_SIZE, 0);
+    if (mensajeLen > 0) {
     // Asumiendo que buffer[0] contiene el byte de control MQTT
     unsigned char byteControl = buffer[0];
 
@@ -65,7 +65,7 @@ if (mensajeLen > 0) {
     perror("Error en recv");
 }
 
-close(sockfd);  // Cerrar la conexión
+//close(sockfd);  // Cerrar la conexión
 return NULL;
 }
 
