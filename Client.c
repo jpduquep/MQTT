@@ -216,6 +216,9 @@ int main(int argc, char *argv[]) {
         perror("Fallo al enviar el mensaje");
         break;
     }
+    else{
+        printf("Send Exitoso! \n");
+    }
 
     // Esperar una respuesta del servidor después de enviar el mensaje
     
