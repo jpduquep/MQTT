@@ -15,10 +15,40 @@
 char bufferRespuesta[TAMANO_BUFFER];
 ssize_t lenRespuesta;
 
+int sockfd;   //https://www.gta.ufrj.br/ensino/eel878/sockets/sockaddr_inman.html
+struct sockaddr_in direccionServidor;
 
-void *manejarMensajesEntrantes(int *data){
-    int sockfd = *data;
-    free(data);
+sockfd = socket(AF_INET, SOCK_STREAM, 0);
+if (sockfd < 0) {
+    perror("Error al crear el socket");
+    exit(EXIT_FAILURE);
+}
+
+    // Esto es para configurar el socket no bloqueante para recv no estanque el programa :D.
+int flags = fcntl(sockfd, F_GETFL, 0);
+if (flags < 0) {
+    perror("fcntl(F_GETFL) falló");
+    close(sockfd);
+    exit(EXIT_FAILURE);
+}
+
+flags = fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
+if (flags < 0) {
+    perror("fcntl(F_SETFL) falló");
+    close(sockfd);
+    exit(EXIT_FAILURE);
+}
+//Hasta aqui config de no bloqueante
+
+
+direccionServidor.sin_port = htons(port); // Use user-specified port
+direccionServidor.sin_addr.s_addr = inet_addr(ip); // Use user-specified IP
+
+
+
+void *manejarMensajesEntrantes(/*void *data */){
+    //int sockfd = *((int*)data)
+    //free(data);
     while(!(lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0) > 0)) {}
     if (lenRespuesta > 0){
     // Asumiendo que el primer byte de bufferRespuesta contiene el byte de control MQTT
@@ -101,36 +131,7 @@ int main(int argc, char *argv[]) {
     fclose(logFile);
 
     // Creating the socket
-    int sockfd;   //https://www.gta.ufrj.br/ensino/eel878/sockets/sockaddr_inman.html
-    struct sockaddr_in direccionServidor;
-
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) {
-        perror("Error al crear el socket");
-        exit(EXIT_FAILURE);
-    }
-
-    // Esto es para configurar el socket no bloqueante para recv no estanque el programa :D.
-    int flags = fcntl(sockfd, F_GETFL, 0);
-    if (flags < 0) {
-        perror("fcntl(F_GETFL) falló");
-        close(sockfd);
-        exit(EXIT_FAILURE);
-    }
-
-    flags = fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
-    if (flags < 0) {
-        perror("fcntl(F_SETFL) falló");
-        close(sockfd);
-        exit(EXIT_FAILURE);
-    }
-    //Hasta aqui config de no bloqueante
-
-    //por fin funciona jajajaj, no se como solucione el error creo que era un stdout.
-    direccionServidor.sin_family = AF_INET;
-    direccionServidor.sin_port = htons(port); // Use user-specified port
-    direccionServidor.sin_addr.s_addr = inet_addr(ip); // Use user-specified IP
-
+    
     // Attempt to connect to the MQTT broker
 
     if (connect(sockfd, (struct sockaddr *)&direccionServidor, sizeof(direccionServidor)) < 0) {
@@ -202,7 +203,7 @@ int main(int argc, char *argv[]) {
         case 2: // CONNACK
             printf("CONNACK recibido, puede comenzar a enviar mensajes.\n");
             pthread_t threadId;
-            if (pthread_create(&threadId, NULL, manejarMensajesEntrantes, &sockfd) != 0) {
+            if (pthread_create(&threadId, NULL, manejarMensajesEntrantes, NULL) != 0) {
                 perror("Error al crear el hilo para la escucha de mensajes");
             }
             else{
