@@ -16,7 +16,7 @@ typedef struct {
     struct sockaddr_in addr;// Información de la dirección del cliente que se conecta al servidor
     pthread_t threadId;
     int isActive; // Indica si la entrada está activa
-} Cliente
+} Cliente;
 
 Cliente clientes[MAX_CLIENTES]; // Array para almacenar clientes
 pthread_mutex_t clientes_mutex = PTHREAD_MUTEX_INITIALIZER; // Mutex para proteger el array de clientes
