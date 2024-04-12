@@ -50,10 +50,11 @@ void *manejarConexionCliente(void *data) {
             unsigned char mensajeConnack = 0b00100000; // Tipo de mensaje CONNACK
             if (send(sockfd, &mensajeConnack, sizeof(mensajeConnack), 0) < 0) {
                 perror("Fallo al enviar mensaje CONNACK");
-            } else {
+            } 
+            else {
                 printf("Mensaje CONNACK enviado al cliente.\n");
-            while ((mensajeLen = recv(sockfd, buffer, BUFFER_SIZE , 0)) > 0) {
-
+                while ((mensajeLen = recv(sockfd, buffer, BUFFER_SIZE , 0)) > 0) {
+                    printf("Estoy en while despues de CONNACK \n");
                 //Este while es despues de recibir el CONNECT y enviar el CONNACK
                 unsigned char byteControl = buffer[0];
 
@@ -69,10 +70,11 @@ void *manejarConexionCliente(void *data) {
                 printf("Contenido del mensaje: %s \n", buffer);
                 */
                 
-            }
+                }
             if (mensajeLen == 0) {
                 printf("Cliente desconectado\n");
-            } else if (mensajeLen < 0) {
+            } 
+            else if (mensajeLen < 0) {
                 perror("Error en recv");
             }
             }
