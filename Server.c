@@ -54,6 +54,8 @@ void *manejarConexionCliente(void *data) {
             //break;
 
         case 3: // PUBLISH
+            printf("Contenido del mensaje: %s \n", buffer);
+            printf("Tamano recibido (bytes): %zd\n", mensajeLen);
             printf("PUBLISH: Publish message\n");
             // Aquí se enviaría una respuesta adecuada para PUBLISH, por ejemplo, PUBACK
             //break;
@@ -63,7 +65,7 @@ void *manejarConexionCliente(void *data) {
         default:
             printf("Mensaje no esperado o desconocido. MessageType: %d\n", messageType);
             printf("Contenido del mensaje: %s \n", buffer);
-            printf("Tamano recibidos (bytes): %zd\n", mensajeLen);
+            printf("Tamano recibido (bytes): %zd\n", mensajeLen);
     }
 } else if (mensajeLen == 0) {
     printf("Cliente desconectado antes de cualquier acción\n");
@@ -71,7 +73,7 @@ void *manejarConexionCliente(void *data) {
     perror("Error en recv");
 }
 
-//close(sockfd);  // Cerrar la conexión
+close(sockfd);  // Cerrar la conexión
 return NULL;
 }
 
