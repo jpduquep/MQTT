@@ -187,8 +187,8 @@ int main(int argc, char *argv[]) {
         default:
             printf("Longitud de la respuesta: %zd\n", lenRespuesta);
             printf("Respuesta no reconocida. Tipo de mensaje: %d\n", messageType);
-            close(sockfd);
-            exit(EXIT_FAILURE);
+            //close(sockfd);
+            //exit(EXIT_FAILURE);
         }
     } 
     else if (lenRespuesta == 0) {
