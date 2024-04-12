@@ -17,7 +17,7 @@ ssize_t lenRespuesta;
 
 
 void *manejarMensajesEntrantes(void *data ){
-    int sockfd = *((int*)data);
+    int sockfd = ((int)data);
    
 
     while(!(lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0) > 0)) {}
@@ -49,7 +49,7 @@ void *manejarMensajesEntrantes(void *data ){
     printf("Cliente desconectado.\n");
     } else if(lenRespuesta == -1) {
     // Manejar error en recv
-    //printf("No hay nada por leer.");
+    
     }
     else{
         perror("Errorete rarete jeje");
@@ -121,14 +121,13 @@ int main(int argc, char *argv[]) {
         close(sockfd);
         exit(EXIT_FAILURE);
     }
-
     flags = fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
     if (flags < 0) {
         perror("fcntl(F_SETFL) falló");
         close(sockfd);
         exit(EXIT_FAILURE);
     }
-    //Hasta aqui config de no bloqueante
+    //Hasta aqui config de no bloqueante y wtf
 
     //por fin funciona jajajaj, no se como solucione el error creo que era un stdout.
     direccionServidor.sin_family = AF_INET;
@@ -188,16 +187,14 @@ int main(int argc, char *argv[]) {
 }
 
     //working...
-
-    // Placeholder for MQTT CONNECT message. Should be replaced with actual implementation.
-    unsigned char mensajeConnect = 0b00010000;
+        unsigned char mensajeConnect = 0b00010000;
         if (send(sockfd, &mensajeConnect, sizeof(mensajeConnect), 0) < 0) {
         perror("Fallo al enviar mensaje CONNECT");
         close(sockfd);
         exit(EXIT_FAILURE);
     }
     else{
-        
+
         printf("Mensaje CONNECT enviado, esperando CONNACK...\n");
         // Esperar respuesta CONNACK del servidor
         while(!(lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0)> 0)){}

@@ -19,7 +19,6 @@ typedef struct {
 void *manejarConexionCliente(void *data) {
     printf("Entrando en manejarConexionCliente ");
     int sockfd = ((int)data); //pointer points to pointer
-    free(data);  // Liberar memoria asignada para el descriptor del socket
 
     char buffer[BUFFER_SIZE];
     ssize_t mensajeLen;
@@ -56,8 +55,8 @@ void *manejarConexionCliente(void *data) {
                 
                 while ((mensajeLen = recv(sockfd, buffer, BUFFER_SIZE , 0)) > 0) {
                     printf("Estoy en while despues de CONNACK \n");
-                    char mensajeX = "Hola se manda al cliente";
-                    send(sockfd,&mensaejX, sizeof(mensajeX),0){}
+                    char *mensajeX = "Hola se manda al cliente";
+                    send(sockfd,&mensajeX, sizeof(mensajeX),0){}
                 //Este while es despues de recibir el CONNECT y enviar el CONNACK
                 unsigned char byteControl = buffer[0];
 
