@@ -18,14 +18,14 @@ typedef struct {
 
 void *manejarConexionCliente(void *data) {
     printf("Entrando en manejarConexionCliente ");
-    int sockfd = *((int*)data); //pointer points to pointer
+    int sockfd = ((int)data); //pointer points to pointer
     free(data);  // Liberar memoria asignada para el descriptor del socket
 
     char buffer[BUFFER_SIZE];
     ssize_t mensajeLen;
 
     // Esperar por un mensaje utf 8 ...
-    // Supongamos que `buffer` es un array de unsigned char recibido de recv y ya está definido.
+    // Supongamos que buffer es un array de unsigned char recibido de recv y ya está definido.
     
 
 

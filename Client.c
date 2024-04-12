@@ -16,9 +16,10 @@ char bufferRespuesta[TAMANO_BUFFER];
 ssize_t lenRespuesta;
 
 
-void *manejarMensajesEntrantes(/*void *data */){
-    //int sockfd = *((int*)data)
-    //free(data);
+void *manejarMensajesEntrantes(void *data ){
+    int sockfd = ((int)data);
+   
+
     while(!(lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0) > 0)) {}
     if (lenRespuesta > 0){
     // Asumiendo que el primer byte de bufferRespuesta contiene el byte de control MQTT
@@ -33,7 +34,7 @@ void *manejarMensajesEntrantes(/*void *data */){
     // No necesitas convertir messageType a una cadena ni usar strtol ya que messageType ya es un entero
 
     switch (messageType) {
-        case 111:
+        case 0:
             break;
 
         default:
@@ -56,6 +57,9 @@ void *manejarMensajesEntrantes(/*void *data */){
     
     return NULL;
 }
+
+
+//Funcion del main.
 int main(int argc, char *argv[]) {
 
     
@@ -135,6 +139,7 @@ int main(int argc, char *argv[]) {
 
     if (connect(sockfd, (struct sockaddr *)&direccionServidor, sizeof(direccionServidor)) < 0) {
     if (errno == EINPROGRESS) {
+
         // La operación de conexión está en progreso
         fd_set writefds;
         FD_ZERO(&writefds);
@@ -201,10 +206,14 @@ int main(int argc, char *argv[]) {
         switch (messageType) {
         case 2: // CONNACK
             printf("CONNACK recibido, puede comenzar a enviar mensajes.\n");
+
             pthread_t threadId;
-            if (pthread_create(&threadId, NULL, manejarMensajesEntrantes, NULL) != 0) {
-                perror("Error al crear el hilo para la escucha de mensajes");
-            }
+
+           if (pthread_create(&threadId, NULL, manejarMensajesEntrantes, (void *)&sockfd) != 0) {
+            perror("Error al crear el hilo para la escucha de mensajes");
+            close(sockfd);
+            exit(EXIT_FAILURE); //chupapi
+        }
             else{
                 printf("Paso por thread de mensajes \n");
             }
@@ -214,11 +223,6 @@ int main(int argc, char *argv[]) {
 
 
     // Receive response from the server
-
-
-    
-
-    // Interactive loop for sending messages to the server
     // Interactive loop for sending messages to the server
     while (1) {
 
