@@ -17,7 +17,7 @@ ssize_t lenRespuesta;
 
 
 void *manejarMensajesEntrantes(void *data ){
-    int sockfd = ((int)data);
+    int sockfd = *((int*)data);
    
 
     while(!(lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0) > 0)) {}
