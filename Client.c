@@ -210,9 +210,9 @@ int main(int argc, char *argv[]) {
     } 
     else if (lenRespuesta == 0) {
     printf("Cliente desconectado.\n");
-    } else {
+    } else if(lenRespuesta == 1) {
     // Manejar error en recv
-    perror("Error en recv");
+    perror("No hay nada por leer.");
     }
     //Termina whiklw(1)
 }
