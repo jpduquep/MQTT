@@ -31,7 +31,7 @@ void *manejarConexionCliente(void *data) {
         buffer[mensajeLen] = '\0';  // Asegurar que el buffer es una cadena de caracteres válida
 
         // Verificar si el mensaje es un CONNECT
-        if (strcmp(buffer, "Mensaje CONNECT") == 0) {
+        if (1) {
             printf("Mensaje CONNECT recibido de un cliente.\n"); // Imprimir cuando se recibe CONNECT
 
             // Enviar respuesta CONNACK (representación simple)
