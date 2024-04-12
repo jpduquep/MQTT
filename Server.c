@@ -17,7 +17,7 @@ typedef struct {
 } Cliente;
 
 void *manejarConexionCliente(void *data) {
-    printf("Entrando en manejarConexionCliente");
+    printf("Entrando en manejarConexionCliente ");
     int sockfd = *((int*)data); //pointer points to pointer
     free(data);  // Liberar memoria asignada para el descriptor del socket
 
@@ -50,17 +50,20 @@ void *manejarConexionCliente(void *data) {
             } else {
                 printf("Mensaje CONNACK enviado al cliente.\n");
             }
-            break;
+            //Aqui iria machetaurio
+            //break;
 
         case 3: // PUBLISH
             printf("PUBLISH: Publish message\n");
             // Aquí se enviaría una respuesta adecuada para PUBLISH, por ejemplo, PUBACK
-            break;
+            //break;
 
         // Agregar más casos según sea necesario
 
         default:
             printf("Mensaje no esperado o desconocido. MessageType: %d\n", messageType);
+            printf("Contenido del mensaje: %s \n", buffer);
+            printf("Tamano recibidos (bytes): %zd\n", mensajeLen);
     }
 } else if (mensajeLen == 0) {
     printf("Cliente desconectado antes de cualquier acción\n");
