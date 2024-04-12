@@ -27,6 +27,8 @@ void *manejarConexionCliente(void *data) {
     // Esperar por un mensaje utf 8 ...
     // Supongamos que `buffer` es un array de unsigned char recibido de recv y ya está definido.
     
+
+
     mensajeLen = recv(sockfd, buffer, BUFFER_SIZE, 0);
     if (mensajeLen > 0) {
     printf("Entrando en mensajeLen>0 \n");
@@ -44,19 +46,33 @@ void *manejarConexionCliente(void *data) {
         case 1: // CONNECT
             printf("CONNECT: Client request to connect to Server\n");
             // Enviar respuesta CONNACK (representación simplificada)
+
             unsigned char mensajeConnack = 0b00100000; // Tipo de mensaje CONNACK
             if (send(sockfd, &mensajeConnack, sizeof(mensajeConnack), 0) < 0) {
                 perror("Fallo al enviar mensaje CONNACK");
             } else {
                 printf("Mensaje CONNACK enviado al cliente.\n");
             }
+            
+            while ((mensajeLen = recv(sockfd, buffer, BUFFER_SIZE , 0)) > 0) {
+                buffer[mensajeLen] = '\0'; // Asegurar que el buffer es una cadena de caracteres válida
+                printf("Mensaje recibido (bytes): %zd\n", mensajeLen);
+                printf("Contenido del mensaje: %s \n", buffer);
+
+                // Aquí se manejarían otros mensajes MQTT recibidos
+            }
+            if (mensajeLen == 0) {
+                printf("Cliente desconectado\n");
+            } else if (mensajeLen < 0) {
+                perror("Error en recv");
+            }
             //Aqui iria machetaurio
             //break;
 
-        case 3: // PUBLISH
-            printf("Contenido del mensaje: %s \n", buffer);
-            printf("Tamano recibido (bytes): %zd\n", mensajeLen);
-            printf("PUBLISH: Publish message\n");
+            case 3: // PUBLISH
+                printf("Contenido del mensaje: %s \n", buffer);
+                printf("Tamano recibido (bytes): %zd\n", mensajeLen);
+                printf("PUBLISH: Publish message\n");
             // Aquí se enviaría una respuesta adecuada para PUBLISH, por ejemplo, PUBACK
             //break;
 
