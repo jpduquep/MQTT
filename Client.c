@@ -7,6 +7,7 @@
 #include <time.h>
 #include <fcntl.h> 
 #include <errno.h> 
+#include <sys/select.h> // Para select()
 //Estos dos ultimas lib son para lo no bloqueante del socket
 
 #define TAMANO_BUFFER 2048
@@ -90,14 +91,53 @@ int main(int argc, char *argv[]) {
     // Attempt to connect to the MQTT broker
 
     if (connect(sockfd, (struct sockaddr *)&direccionServidor, sizeof(direccionServidor)) < 0) {
+    if (errno == EINPROGRESS) {
+        // La operación de conexión está en progreso
+        fd_set writefds;
+        FD_ZERO(&writefds);
+        FD_SET(sockfd, &writefds);
+
+        struct timeval tv;
+        tv.tv_sec = 5; // Espera hasta 5 segundos
+        tv.tv_usec = 0;
+
+        int res = select(sockfd + 1, NULL, &writefds, NULL, &tv);
+        if (res > 0) {
+            // El socket está listo para escribir, lo que indica que la conexión puede haberse establecido
+            int so_error;
+            socklen_t len = sizeof(so_error);
+
+            getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &so_error, &len);
+
+            if (so_error == 0) {
+                printf("Conectado al servidor MQTT.\n");
+            } else {
+                // Hubo un error al establecer la conexión
+                fprintf(stderr, "Conexión fallida: %s\n", strerror(so_error));
+                close(sockfd);
+                exit(EXIT_FAILURE);
+            }
+        } else if (res == 0) {
+            // Timeout: La conexión no se estableció en el tiempo esperado
+            fprintf(stderr, "Conexión fallida: Timeout\n");
+            close(sockfd);
+            exit(EXIT_FAILURE);
+        } else {
+            // Error en select()
+            perror("select() falló");
+            close(sockfd);
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        // Error inmediato en connect()
         perror("Conexión fallida");
         close(sockfd);
         exit(EXIT_FAILURE);
-        
-    } else {
-        printf("Conectado al servidor MQTT.\n");
-        fflush(stdout);
     }
+} else {
+    // Conexión establecida inmediatamente (poco probable en modo no bloqueante)
+    printf("Conectado al servidor MQTT.\n");
+}
 
     //working...
 
