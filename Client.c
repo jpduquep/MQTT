@@ -164,24 +164,7 @@ int main(int argc, char *argv[]) {
     // Interactive loop for sending messages to the server
     while (1) {
 
-    printf("Ingrese su mensaje (escriba 'salir' para terminar): ");
-    if (fgets(bufferRespuesta, TAMANO_BUFFER, stdin) == NULL) {
-        printf("EOF!!");
-        break; // Manejar EOF
-    }
-    if (strcmp(bufferRespuesta, "salir\n") == 0) {
-        printf("Hasta luego!");
-        break;
-    }
-
-    // Enviar el mensaje ingresado al servidor
-    if (send(sockfd, bufferRespuesta, strlen(bufferRespuesta), 0) < 0) {
-        perror("Fallo al enviar el mensaje");
-        break;
-    }
-
-    // Esperar una respuesta del servidor después de enviar el mensaje
-    lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0);
+        lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0);
     if (lenRespuesta > 0) {
     // Asumiendo que el primer byte de bufferRespuesta contiene el byte de control MQTT
     unsigned char byteControl = bufferRespuesta[0];
@@ -210,10 +193,32 @@ int main(int argc, char *argv[]) {
     } 
     else if (lenRespuesta == 0) {
     printf("Cliente desconectado.\n");
-    } else if(lenRespuesta == 1) {
+    } else if(lenRespuesta == -1) {
     // Manejar error en recv
-    perror("No hay nada por leer.");
+    printf("No hay nada por leer.");
     }
+    else(){
+        perror("Errorete rarete jeje");
+    }
+
+    printf("Ingrese su mensaje (escriba 'salir' para terminar): ");
+    if (fgets(bufferRespuesta, TAMANO_BUFFER, stdin) == NULL) {
+        printf("EOF!!");
+        break; // Manejar EOF
+    }
+    if (strcmp(bufferRespuesta, "salir\n") == 0) {
+        printf("Hasta luego!");
+        break;
+    }
+
+    // Enviar el mensaje ingresado al servidor
+    if (send(sockfd, bufferRespuesta, strlen(bufferRespuesta), 0) < 0) {
+        perror("Fallo al enviar el mensaje");
+        break;
+    }
+
+    // Esperar una respuesta del servidor después de enviar el mensaje
+    
     //Termina whiklw(1)
 }
 
