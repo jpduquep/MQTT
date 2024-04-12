@@ -6,14 +6,19 @@
 #include <sys/socket.h>
 #include <time.h>
 #include <fcntl.h> 
+#include <pthread.h>
 #include <errno.h> 
 #include <sys/select.h> // Para select()
 //Estos dos ultimas lib son para lo no bloqueante del socket
+#define TAMANO_BUFFER 2048
+
 char bufferRespuesta[TAMANO_BUFFER];
 ssize_t lenRespuesta;
 
-#define TAMANO_BUFFER 2048
-void *manejarMensajesEntrantes(){
+
+void *manejarMensajesEntrantes(void *data){
+    int sockfd = *((int*)data);
+    free(data);
     while(!(lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0) > 0)) {}
     if (lenRespuesta > 0){
     // Asumiendo que el primer byte de bufferRespuesta contiene el byte de control MQTT
@@ -197,7 +202,7 @@ int main(int argc, char *argv[]) {
         case 2: // CONNACK
             printf("CONNACK recibido, puede comenzar a enviar mensajes.\n");
             pthread_t threadId;
-            if (pthread_create(&threadId, NULL, manejarMensajesEntrantes, NULL) != 0) {
+            if (pthread_create(&threadId, NULL, manejarMensajesEntrantes, sockfd) != 0) {
                 perror("Error al crear el hilo para la escucha de mensajes");
             }
             else{
