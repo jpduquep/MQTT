@@ -13,13 +13,74 @@
 // Estructura para almacenar la información del cliente
 typedef struct {
     int sockfd;
-    struct sockaddr_in addr; // Información de la dirección del cliente que se conecta al servidor
-} Cliente;
+    struct sockaddr_in addr;// Información de la dirección del cliente que se conecta al servidor
+    pthread_t threadId;
+    int isActive; // Indica si la entrada está activa
+} Cliente
+
+Cliente clientes[MAX_CLIENTES]; // Array para almacenar clientes
+pthread_mutex_t clientes_mutex = PTHREAD_MUTEX_INITIALIZER; // Mutex para proteger el array de clientes
+// Inicializar la lista de clientes
+void initClientes() {
+    for (int i = 0; i < MAX_CLIENTES; i++) {
+        clientes[i].sockfd = -1;
+        clientes[i].isActive = 0;
+    }
+}
+
+// Añadir un cliente a la lista
+int agregarCliente(int sockfd, struct sockaddr_in addr) {
+    pthread_mutex_lock(&clientes_mutex);
+    for (int i = 0; i < MAX_CLIENTES; i++) {
+        if (!clientes[i].isActive) {
+            clientes[i].sockfd = sockfd;
+            clientes[i].addr = addr;
+            clientes[i].isActive = 1;
+            pthread_mutex_unlock(&clientes_mutex);
+            return i;
+        }
+    }
+    pthread_mutex_unlock(&clientes_mutex);
+    return -1;
+}
+
+// Remover un cliente de la lista
+void removerCliente(int index) {
+    pthread_mutex_lock(&clientes_mutex);
+    if (index >= 0 && index < MAX_CLIENTES && clientes[index].isActive) {
+        clientes[index].isActive = 0;
+        close(clientes[index].sockfd);
+    }
+    pthread_mutex_unlock(&clientes_mutex);
+}
+void enviarATodos(char *mensaje) {
+    pthread_mutex_lock(&clientes_mutex);
+    for (int i = 0; i < MAX_CLIENTES; i++) {
+        if (clientes[i].isActive) {
+            if (send(clientes[i].sockfd, mensaje, strlen(mensaje), 0) < 0) {
+                perror("Error al enviar mensaje a cliente");
+                // Podrías considerar remover el cliente si hay un error
+                removerCliente(i);
+            }
+        }
+    }
+    pthread_mutex_unlock(&clientes_mutex);
+}
 
 void *manejarConexionCliente(void *data) {
     printf("Entrando en manejarConexionCliente ");
     int sockfd = *((int*)data); //pointer points to pointer
 
+    struct sockaddr_in addr;
+    socklen_t addr_len = sizeof(struct sockaddr_in);
+    getpeername(sockfd, (struct sockaddr *)&addr, &addr_len); // Obtiene la dirección del cliente
+
+    int index = agregarCliente(sockfd, addr);
+    if (index == -1) {
+        printf("Máximo número de clientes alcanzado.\n");
+        close(sockfd);
+        return NULL;
+    }
     char buffer[BUFFER_SIZE];
     ssize_t mensajeLen;
 
@@ -55,8 +116,9 @@ void *manejarConexionCliente(void *data) {
                 
                 while ((mensajeLen = recv(sockfd, buffer, BUFFER_SIZE , 0)) > 0) {
                     printf("Estoy en while despues de CONNACK \n");
-                    char *mensajeX = "Hola se manda al cliente";
-                    send(sockfd,&mensajeX, sizeof(mensajeX),0);
+
+                    char mensaje[] = "CHUPAPI";
+                    enviarATodos(mensaje);
                 //Este while es despues de recibir el CONNECT y enviar el CONNACK
                 unsigned char byteControl = buffer[0];
 
@@ -98,6 +160,7 @@ void *manejarConexionCliente(void *data) {
 
 printf("Cerrando por Ult de manejarConexionCliente \n");
 close(sockfd);  // Cerrar la conexión
+removerCliente(index);
 return NULL;
 }
 
@@ -108,6 +171,8 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Uso: %s <ip> <port> <path/log.log>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
+
+    initClientes();
     
     char *ip = argv[1];
     char *port = argv[2];
