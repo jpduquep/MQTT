@@ -53,24 +53,23 @@ void *manejarConexionCliente(void *data) {
             } 
             else {
                 printf("Mensaje CONNACK enviado al cliente.\n");
+                
                 while ((mensajeLen = recv(sockfd, buffer, BUFFER_SIZE , 0)) > 0) {
                     printf("Estoy en while despues de CONNACK \n");
+                    char mensajeX = "Hola se manda al cliente";
+                    send(sockfd,&mensaejX, sizeof(mensajeX),0){}
                 //Este while es despues de recibir el CONNECT y enviar el CONNACK
                 unsigned char byteControl = buffer[0];
 
-                // Descomponer el byte de control
+                
                 unsigned char messageType = (byteControl >> 4) & 0x0F; // Primeros 4 bits
                 unsigned char dupFlag = (byteControl >> 3) & 0x01;     // Quinto bit
                 unsigned char qosLevel = (byteControl >> 1) & 0x03;    // Sexto y séptimo bits
                 unsigned char retain = byteControl & 0x01;
                 
-                /*
-                buffer[mensajeLen] = '\0'; // Asegurar que el buffer es una cadena de caracteres válida
-                printf("Mensaje recibido (bytes): %zd\n", mensajeLen);
-                printf("Contenido del mensaje: %s \n", buffer);
-                */
                 
-                }
+                
+                } 
             if (mensajeLen == 0) {
                 printf("Cliente desconectado\n");
             } 
@@ -98,6 +97,7 @@ void *manejarConexionCliente(void *data) {
     perror("Error en recv");
 }
 
+printf("Cerrando por Ult de manejarConexionCliente \n");
 close(sockfd);  // Cerrar la conexión
 return NULL;
 }

@@ -9,13 +9,51 @@
 #include <errno.h> 
 #include <sys/select.h> // Para select()
 //Estos dos ultimas lib son para lo no bloqueante del socket
+char bufferRespuesta[TAMANO_BUFFER];
+ssize_t lenRespuesta;
 
 #define TAMANO_BUFFER 2048
+void *manejarMensajesEntrantes(){
+    while(!(lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0) > 0)) {}
+    if (lenRespuesta > 0){
+    // Asumiendo que el primer byte de bufferRespuesta contiene el byte de control MQTT
+    unsigned char byteControl = bufferRespuesta[0];
 
+    // Descomponer el byte de control
+    unsigned char messageType = (byteControl >> 4) & 0x0F; // Primeros 4 bits para el tipo de mensaje
+    unsigned char dupFlag = (byteControl >> 3) & 0x01;     // Quinto bit para la bandera DUP
+    unsigned char qosLevel = (byteControl >> 1) & 0x03;    // Sexto y séptimo bits para el nivel QoS
+    unsigned char retain = byteControl & 0x01;             // Octavo bit para la bandera RETAIN
+
+    // No necesitas convertir messageType a una cadena ni usar strtol ya que messageType ya es un entero
+
+    switch (messageType) {
+        case 111:
+            break;
+
+        default:
+            printf("Longitud de la respuesta: %zd\n", lenRespuesta);
+            printf("Contenido del mensaje: %s \n", bufferRespuesta);
+            printf("Respuesta no reconocida. Tipo de mensaje: %d\n", messageType);
+            //close(sockfd);
+            //exit(EXIT_FAILURE);
+    }
+    }
+    else if (lenRespuesta == 0) {
+    printf("Cliente desconectado.\n");
+    } else if(lenRespuesta == -1) {
+    // Manejar error en recv
+    //printf("No hay nada por leer.");
+    }
+    else{
+        perror("Errorete rarete jeje");
+    }
+    
+    return NULL;
+}
 int main(int argc, char *argv[]) {
 
-    char bufferRespuesta[TAMANO_BUFFER];
-    ssize_t lenRespuesta;
+    
     // Ensure correct usage
     if (argc != 2) {
         printf("Usage: %s <Location/log.txt>\n", argv[0]);
@@ -158,6 +196,13 @@ int main(int argc, char *argv[]) {
         switch (messageType) {
         case 2: // CONNACK
             printf("CONNACK recibido, puede comenzar a enviar mensajes.\n");
+            pthread_t threadId;
+            if (pthread_create(&threadId, NULL, manejarMensajesEntrantes, NULL) != 0) {
+                perror("Error al crear el hilo para la escucha de mensajes");
+            }
+            else{
+                printf("Paso por thread de mensajes \n");
+            }
             break;
         }
     }
@@ -172,54 +217,8 @@ int main(int argc, char *argv[]) {
     // Interactive loop for sending messages to the server
     while (1) {
 
-    
 
-
-
-
-
-
-
-
-    
-    // while(!(lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0)> 0)){}  //Bloqueador
-    if (lenRespuesta > 0) {
-    // Asumiendo que el primer byte de bufferRespuesta contiene el byte de control MQTT
-    unsigned char byteControl = bufferRespuesta[0];
-
-    // Descomponer el byte de control
-    unsigned char messageType = (byteControl >> 4) & 0x0F; // Primeros 4 bits para el tipo de mensaje
-    unsigned char dupFlag = (byteControl >> 3) & 0x01;     // Quinto bit para la bandera DUP
-    unsigned char qosLevel = (byteControl >> 1) & 0x03;    // Sexto y séptimo bits para el nivel QoS
-    unsigned char retain = byteControl & 0x01;             // Octavo bit para la bandera RETAIN
-
-    // No necesitas convertir messageType a una cadena ni usar strtol ya que messageType ya es un entero
-
-        switch (messageType) {
-        case 2: // CONNACK
-            printf("CONNACK recibido, puede comenzar a enviar mensajes.\n");
-            break;
-
-        // Agregar más casos según sea necesario
-
-        default:
-            printf("Longitud de la respuesta: %zd\n", lenRespuesta);
-            printf("Respuesta no reconocida. Tipo de mensaje: %d\n", messageType);
-            //close(sockfd);
-            //exit(EXIT_FAILURE);
-        }
-    } 
-    else if (lenRespuesta == 0) {
-    printf("Cliente desconectado.\n");
-    } else if(lenRespuesta == -1) {
-    // Manejar error en recv
-    //printf("No hay nada por leer.");
-    }
-    else{
-        perror("Errorete rarete jeje");
-    }
-    lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0);
-
+    //Bloqueador de mensaje
     printf("Ingrese su mensaje (escriba 'salir' para terminar): ");
     if (fgets(bufferRespuesta, TAMANO_BUFFER, stdin) == NULL) {
         printf("EOF!!");
