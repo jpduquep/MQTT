@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
         else{
-            printf("Paso por ");
+            printf("Paso por NuevoSockfd ");
         }
 
         pthread_t threadId;

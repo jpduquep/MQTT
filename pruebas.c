@@ -19,7 +19,7 @@ Cliente clientes[MAX_CLIENTES];
 pthread_mutex_t mutexClientes = PTHREAD_MUTEX_INITIALIZER;
 
 void *manejarConexionCliente(void *data) {
-    int sockfd = ((int)data);
+    int sockfd = *((int*)data);
     free(data);  // Liberar memoria asignada para el descriptor del socket
 
     char buffer[TAMANO_BUFFER];
