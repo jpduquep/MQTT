@@ -25,6 +25,7 @@ void *manejarConexionCliente(void *data) {
 
     // Esperar por un mensaje utf 8 ...
     // Supongamos que `buffer` es un array de unsigned char recibido de recv y ya está definido.
+    
     mensajeLen = recv(sockfd, buffer, BUFFER_SIZE, 0);
     if (mensajeLen > 0) {
     // Asumiendo que buffer[0] contiene el byte de control MQTT
@@ -134,12 +135,18 @@ int main(int argc, char *argv[]) {
             free(nuevoSockfd);
             continue;
         }
+        else{
+            printf("Paso por ");
+        }
 
         pthread_t threadId;
         if (pthread_create(&threadId, NULL, manejarConexionCliente, nuevoSockfd) != 0) {
             perror("Error al crear el hilo del cliente");
             close(*nuevoSockfd);
             free(nuevoSockfd);
+        }
+        else{
+            printf("Paso por thread \n");
         }
     }
 

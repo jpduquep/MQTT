@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
     printf("Cliente desconectado.\n");
     } else if(lenRespuesta == -1) {
     // Manejar error en recv
-    printf("No hay nada por leer.");
+    //printf("No hay nada por leer.");
     }
     else{
         perror("Errorete rarete jeje");
