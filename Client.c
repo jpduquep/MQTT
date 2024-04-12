@@ -5,6 +5,9 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <time.h>
+#include <fcntl.h> 
+#include <errno.h> 
+//Estos dos ultimas lib son para lo no bloqueante del socket
 
 #define TAMANO_BUFFER 2048
 
