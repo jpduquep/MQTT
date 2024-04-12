@@ -16,8 +16,8 @@ char bufferRespuesta[TAMANO_BUFFER];
 ssize_t lenRespuesta;
 
 
-void *manejarMensajesEntrantes(void *data){
-    int sockfd = *((int*)data);
+void *manejarMensajesEntrantes(int *data){
+    int sockfd = data;
     free(data);
     while(!(lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0) > 0)) {}
     if (lenRespuesta > 0){
@@ -202,7 +202,7 @@ int main(int argc, char *argv[]) {
         case 2: // CONNACK
             printf("CONNACK recibido, puede comenzar a enviar mensajes.\n");
             pthread_t threadId;
-            if (pthread_create(&threadId, NULL, manejarMensajesEntrantes, sockfd) != 0) {
+            if (pthread_create(&threadId, NULL, manejarMensajesEntrantes, *sockfd) != 0) {
                 perror("Error al crear el hilo para la escucha de mensajes");
             }
             else{
