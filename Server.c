@@ -52,28 +52,35 @@ void *manejarConexionCliente(void *data) {
                 perror("Fallo al enviar mensaje CONNACK");
             } else {
                 printf("Mensaje CONNACK enviado al cliente.\n");
-            }
-            
             while ((mensajeLen = recv(sockfd, buffer, BUFFER_SIZE , 0)) > 0) {
+
+                //Este while es despues de recibir el CONNECT y enviar el CONNACK
+                unsigned char byteControl = buffer[0];
+
+                // Descomponer el byte de control
+                unsigned char messageType = (byteControl >> 4) & 0x0F; // Primeros 4 bits
+                unsigned char dupFlag = (byteControl >> 3) & 0x01;     // Quinto bit
+                unsigned char qosLevel = (byteControl >> 1) & 0x03;    // Sexto y séptimo bits
+                unsigned char retain = byteControl & 0x01;
+                
+                /*
                 buffer[mensajeLen] = '\0'; // Asegurar que el buffer es una cadena de caracteres válida
                 printf("Mensaje recibido (bytes): %zd\n", mensajeLen);
                 printf("Contenido del mensaje: %s \n", buffer);
-
-                // Aquí se manejarían otros mensajes MQTT recibidos
+                */
+                
             }
             if (mensajeLen == 0) {
                 printf("Cliente desconectado\n");
             } else if (mensajeLen < 0) {
                 perror("Error en recv");
             }
-            //Aqui iria machetaurio
+            }
+            
+            
+            //Aqui arriba cambios
             //break;
 
-            case 3: // PUBLISH
-                printf("Contenido del mensaje: %s \n", buffer);
-                printf("Tamano recibido (bytes): %zd\n", mensajeLen);
-                printf("PUBLISH: Publish message\n");
-            // Aquí se enviaría una respuesta adecuada para PUBLISH, por ejemplo, PUBACK
             //break;
 
         // Agregar más casos según sea necesario

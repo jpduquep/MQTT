@@ -152,6 +152,14 @@ int main(int argc, char *argv[]) {
         
         printf("Mensaje CONNECT enviado, esperando CONNACK...\n");
         // Esperar respuesta CONNACK del servidor
+        while(!(lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0)> 0)){}
+        unsigned char byteControl = bufferRespuesta[0];
+        unsigned char messageType = (byteControl >> 4) & 0x0F;
+        switch (messageType) {
+        case 2: // CONNACK
+            printf("CONNACK recibido, puede comenzar a enviar mensajes.\n");
+            break;
+        }
     }
 
 
@@ -164,7 +172,17 @@ int main(int argc, char *argv[]) {
     // Interactive loop for sending messages to the server
     while (1) {
 
-        lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0);
+    
+
+
+
+
+
+
+
+
+    
+    // while(!(lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0)> 0)){}  //Bloqueador
     if (lenRespuesta > 0) {
     // Asumiendo que el primer byte de bufferRespuesta contiene el byte de control MQTT
     unsigned char byteControl = bufferRespuesta[0];
@@ -200,6 +218,7 @@ int main(int argc, char *argv[]) {
     else{
         perror("Errorete rarete jeje");
     }
+    lenRespuesta = recv(sockfd, bufferRespuesta, TAMANO_BUFFER, 0);
 
     printf("Ingrese su mensaje (escriba 'salir' para terminar): ");
     if (fgets(bufferRespuesta, TAMANO_BUFFER, stdin) == NULL) {
@@ -225,7 +244,7 @@ int main(int argc, char *argv[]) {
     //Termina whiklw(1)
 }
 
-        // Cerrar el socket antes de terminar el programa
+    // Cerrar el socket antes de terminar el programa
     close(sockfd);
 
     return 0;
