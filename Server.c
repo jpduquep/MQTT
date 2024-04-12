@@ -17,6 +17,7 @@ typedef struct {
 } Cliente;
 
 void *manejarConexionCliente(void *data) {
+    printf("Entrando en manejarConexionCliente");
     int sockfd = *((int*)data); //pointer points to pointer
     free(data);  // Liberar memoria asignada para el descriptor del socket
 
@@ -28,6 +29,7 @@ void *manejarConexionCliente(void *data) {
     
     mensajeLen = recv(sockfd, buffer, BUFFER_SIZE, 0);
     if (mensajeLen > 0) {
+    printf("Entrando en mensajeLen>0 \n");
     // Asumiendo que buffer[0] contiene el byte de control MQTT
     unsigned char byteControl = buffer[0];
 
