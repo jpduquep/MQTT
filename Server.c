@@ -127,7 +127,7 @@ void *manejarConexionCliente(void *data) {
                 unsigned char qosLevel = (byteControl >> 1) & 0x03;    // Sexto y séptimo bits
                 unsigned char retain = byteControl & 0x01;
                 
-                switch(messageType):
+                switch(messageType){
 
                 case 3:
                     printf("PUBLISH: Recibido un mensaje de publicación.\n");
@@ -158,7 +158,8 @@ void *manejarConexionCliente(void *data) {
                     enviarATodos(mensajeCompleto);
                     break;
                 
-                } 
+                }
+                }
             if (mensajeLen == 0) {
                 printf("Cliente desconectado\n");
             } 
