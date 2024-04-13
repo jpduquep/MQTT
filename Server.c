@@ -91,7 +91,7 @@ void *manejarConexionCliente(void *data) {
 
     mensajeLen = recv(sockfd, buffer, BUFFER_SIZE, 0);
     if (mensajeLen > 0) {
-    printf("Entrando en mensajeLen>0 \n");
+    //printf("Entrando en mensajeLen>0 \n"); Control
     // Asumiendo que buffer[0] contiene el byte de control MQTT
     unsigned char byteControl = buffer[0];
 
@@ -115,7 +115,7 @@ void *manejarConexionCliente(void *data) {
                 printf("Mensaje CONNACK enviado al cliente.\n");
                 
                 while ((mensajeLen = recv(sockfd, buffer, BUFFER_SIZE , 0)) > 0) {
-                    printf("Estoy en while despues de CONNACK \n");
+                    //printf("Estoy en while despues de CONNACK \n"); Control
 
                     
                 //Este while es despues de recibir el CONNECT y enviar el CONNACK
