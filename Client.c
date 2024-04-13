@@ -15,6 +15,12 @@
 char bufferRespuesta[TAMANO_BUFFER];
 ssize_t lenRespuesta;
 
+void lengthToBinary(int length, char* binary) {
+    for (int i = 7; i >= 0; --i) {
+        binary[7 - i] = (length & (1 << i)) ? '1' : '0';
+    }
+    binary[8] = '\0';  // Termina la cadena de caracteres
+}
 
 void *manejarMensajesEntrantes(void *data ){
     int sockfd = *((int*)data);
@@ -218,18 +224,77 @@ int main(int argc, char *argv[]) {
         }
     }
 
-
+    int opcion;
+    char mensaje[1024];
+    char topico[256];
+    unsigned char paquete[2048];
     // Receive response from the server
     // Interactive loop for sending messages to the server
     while (1) {
 
+        printf("Seleccione una opción:\n");
+        printf("1. Publicar\n");
+        printf("2. Suscribirse\n");
+        printf("3. Desuscribirse\n");
+        printf("4. Desconectarse\n");
+        scanf("%d", &opcion);
 
+        switch (opcion) {
+            case 1:
+            
+                printf("Ingrese el mensaje:\n");
+                scanf(" %[^\n]", mensaje);
+                printf("Ingrese el tópico:\n");
+                scanf(" %[^\n]", topico);
+
+                int topico_len = strlen(topico);
+                int mensaje_len = strlen(mensaje);
+
+                paquete[0] = 0x30;  // Primer byte fijo 00110000 en hexadecimal
+                lengthToBinary(topico_len, (char*)&paquete[1]); // Segundo byte: longitud del tópico en binario
+
+                memcpy(&paquete[2], topico, topico_len); // Copia el tópico al paquete
+
+                paquete[2 + topico_len] = 0xDB; // N + 1 byte: identificador del paquete 11011011 en hexadecimal
+
+                memcpy(&paquete[3 + topico_len], mensaje, mensaje_len); // Copia el mensaje después del identificador del paquete
+
+                // Imprimir el paquete para verificación
+                printf("Paquete creado:\n");
+                for (int i = 0; i < 3 + topico_len + mensaje_len; i++) {
+                    printf("%02X ", paquete[i]);
+                }
+                printf("\n");
+
+                ssize_t bytes_sent = send(sockfd, paquete, 3 + topico_len + mensaje_len, 0);
+                if (bytes_sent < 0) {
+                    perror("Fallo al enviar el paquete");
+                    close(sockfd);
+                    exit(EXIT_FAILURE);
+                } else {
+                    printf("Paquete enviado con éxito. Bytes enviados: %zd\n", bytes_sent);
+                }
+                break;
+            case 2:
+                //Suscribirse
+            case 3:
+                //Desuscribirse
+            case 4:
+                printf("Desconectándose...\n");
+                return 0;
+            default:
+                printf("Opción no válida. Intente de nuevo.\n");
+                break;
+        }
     //Bloqueador de mensaje
+
+    /*
     printf("Ingrese su mensaje (escriba 'salir' para terminar): ");
     if (fgets(bufferRespuesta, TAMANO_BUFFER, stdin) == NULL) {
         printf("EOF!!");
         break; // Manejar EOF
     }
+    */
     if (strcmp(bufferRespuesta, "salir\n") == 0) {
         printf("Hasta luego!");
         break;

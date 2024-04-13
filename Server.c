@@ -117,8 +117,7 @@ void *manejarConexionCliente(void *data) {
                 while ((mensajeLen = recv(sockfd, buffer, BUFFER_SIZE , 0)) > 0) {
                     printf("Estoy en while despues de CONNACK \n");
 
-                    char mensaje[] = "CHUPAPI";
-                    enviarATodos(mensaje);
+                    
                 //Este while es despues de recibir el CONNECT y enviar el CONNACK
                 unsigned char byteControl = buffer[0];
 
@@ -128,7 +127,36 @@ void *manejarConexionCliente(void *data) {
                 unsigned char qosLevel = (byteControl >> 1) & 0x03;    // Sexto y séptimo bits
                 unsigned char retain = byteControl & 0x01;
                 
-                
+                switch(messageType):
+
+                case 3:
+                    printf("PUBLISH: Recibido un mensaje de publicación.\n");
+        
+                    // Asignar y verificar el tipo de mensaje y otros flags si necesario
+                    // Ya tenemos messageType, dupFlag, qosLevel, retain desde antes
+                    
+                    // Leer la longitud del tópico
+                    int longitudTopico = buffer[1];
+                    char topico[256] = {0}; // Asegúrate que el tamaño del topico sea suficiente o maneja dinámicamente
+                    memcpy(topico, &buffer[2], longitudTopico);
+                    
+                    // Identificador del paquete
+                    unsigned char identificadorPaquete = buffer[2 + longitudTopico];
+                    
+                    // Extraer el mensaje
+                    char mensaje[1024] = {0}; // Asegúrate de que el buffer sea suficiente o maneja dinámicamente
+                    int inicioMensaje = 3 + longitudTopico;
+                    int longitudMensaje = mensajeLen - inicioMensaje;
+                    memcpy(mensaje, &buffer[inicioMensaje], longitudMensaje);
+                    
+                    printf("Topico: %s\n", topico);
+                    printf("Mensaje: %s\n", mensaje);
+                    
+                    // Opcionalmente, puedes usar la función enviarATodos para retransmitir este mensaje
+                    char mensajeCompleto[2048]; // Este tamaño debería ser calculado basado en la longitud del mensaje y el tópico
+                    sprintf(mensajeCompleto, "Topico: %s, Mensaje: %s", topico, mensaje);
+                    enviarATodos(mensajeCompleto);
+                    break;
                 
                 } 
             if (mensajeLen == 0) {
@@ -146,7 +174,7 @@ void *manejarConexionCliente(void *data) {
             //break;
 
         // Agregar más casos según sea necesario
-
+        
         default:
             printf("Mensaje no esperado o desconocido. MessageType: %d\n", messageType);
             printf("Contenido del mensaje: %s \n", buffer);
