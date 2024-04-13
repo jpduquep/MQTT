@@ -68,7 +68,7 @@ void enviarATodos(char *mensaje) {
 }
 
 void *manejarConexionCliente(void *data) {
-    printf("Entrando en manejarConexionCliente ");
+    //printf("Entrando en manejarConexionCliente ");
     int sockfd = *((int*)data); //pointer points to pointer
 
     struct sockaddr_in addr;
@@ -187,7 +187,7 @@ void *manejarConexionCliente(void *data) {
     perror("Error en recv");
 }
 
-printf("Cerrando por Ult de manejarConexionCliente \n");
+//printf("Cerrando por Ult de manejarConexionCliente \n"); Control
 close(sockfd);  // Cerrar la conexión
 removerCliente(index);
 return NULL;
@@ -261,7 +261,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
         else{
-            printf("Paso por NuevoSockfd ");
+            //printf("Paso por NuevoSockfd "); Control
         }
 
         pthread_t threadId;
@@ -271,7 +271,7 @@ int main(int argc, char *argv[]) {
             free(nuevoSockfd);
         }
         else{
-            printf("Paso por thread \n");
+            //printf("Paso por thread \n"); Control
         }
     }
 

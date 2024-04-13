@@ -37,19 +37,14 @@ void *manejarMensajesEntrantes(void *data ){
     unsigned char qosLevel = (byteControl >> 1) & 0x03;    // Sexto y séptimo bits para el nivel QoS
     unsigned char retain = byteControl & 0x01;             // Octavo bit para la bandera RETAIN
 
-    // No necesitas convertir messageType a una cadena ni usar strtol ya que messageType ya es un entero
+    
 
-    switch (messageType) {
-        case 0:
-            break;
-
-        default:
-            printf("Longitud de la respuesta: %zd\n", lenRespuesta);
-            printf("Contenido del mensaje: %s \n", bufferRespuesta);
-            printf("Respuesta no reconocida. Tipo de mensaje: %d\n", messageType);
-            //close(sockfd);
-            //exit(EXIT_FAILURE);
-    }
+    
+    printf("MENSAJE DEL SERVER! \n");
+    printf("Contenido del mensaje: %s \n", bufferRespuesta);
+    //close(sockfd);
+    //exit(EXIT_FAILURE);
+    
     }
     else if (lenRespuesta == 0) {
     printf("Cliente desconectado.\n");
@@ -218,7 +213,7 @@ int main(int argc, char *argv[]) {
             exit(EXIT_FAILURE); //chupapi
         }
             else{
-                printf("Paso por thread de mensajes \n");
+                //printf("Paso por thread de mensajes \n");
             }
             break;
         }
